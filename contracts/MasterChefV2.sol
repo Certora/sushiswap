@@ -63,7 +63,7 @@ contract MasterChefV2 is BoringOwnable, BoringBatchable {
     /// @notice Info of each user that stakes LP tokens.
     mapping (uint256 => mapping (address => UserInfo)) public userInfo;
     /// @dev Total allocation points. Must be the sum of all allocation points in all pools.
-    uint256 totalAllocPoint;
+    uint256 public totalAllocPoint;
 
     uint256 private constant MASTERCHEF_SUSHI_PER_BLOCK = 1e20;
     uint256 private constant ACC_SUSHI_PRECISION = 1e12;
@@ -181,7 +181,7 @@ contract MasterChefV2 is BoringOwnable, BoringBatchable {
     }
 
     /// @notice Calculates and returns the `amount` of SUSHI per block.
-    function sushiPerBlock() public view returns (uint256 amount) {
+    function sushiPerBlock() public view virtual returns (uint256 amount) {
         amount = uint256(MASTERCHEF_SUSHI_PER_BLOCK)
             .mul(MASTER_CHEF.poolInfo(MASTER_PID).allocPoint) / MASTER_CHEF.totalAllocPoint();
     }
@@ -217,7 +217,7 @@ contract MasterChefV2 is BoringOwnable, BoringBatchable {
         user.rewardDebt = user.rewardDebt.add(int256(amount.mul(pool.accSushiPerShare) / ACC_SUSHI_PRECISION));
 
         // Interactions
-        lpToken[pid].safeTransferFrom(msg.sender, address(this), amount);
+        lpToken[pid].transferFrom(msg.sender, address(this), amount);
 
         emit Deposit(msg.sender, pid, amount, to);
     }
@@ -235,7 +235,7 @@ contract MasterChefV2 is BoringOwnable, BoringBatchable {
         user.amount = user.amount.sub(amount);
 
         // Interactions
-        lpToken[pid].safeTransfer(to, amount);
+        lpToken[pid].transfer(to, amount);
 
         emit Withdraw(msg.sender, pid, amount, to);
     }
@@ -255,7 +255,7 @@ contract MasterChefV2 is BoringOwnable, BoringBatchable {
         user.rewardDebt = accumulatedSushi;
 
         // Interactions
-        SUSHI.safeTransfer(to, _pendingSushi);
+        SUSHI.transfer(to, _pendingSushi);
 
         address _rewarder = address(rewarder[pid]);
         if (_rewarder != address(0)) {
@@ -283,7 +283,7 @@ contract MasterChefV2 is BoringOwnable, BoringBatchable {
         user.amount = 0;
         user.rewardDebt = 0;
         // Note: transfer can fail or succeed if `amount` is zero.
-        lpToken[pid].safeTransfer(to, amount);
+        lpToken[pid].transfer(to, amount);
         emit EmergencyWithdraw(msg.sender, pid, amount, to);
     }
 }

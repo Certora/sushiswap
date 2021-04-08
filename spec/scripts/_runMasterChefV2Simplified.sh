@@ -1,0 +1,2 @@
+# For windows replace certoraRun -> certoraRun.py and you might want to add --solc
+certoraRun spec/harnesses/MasterChefV2SimplifiedHarness.sol spec/harnesses/DummyERC20A.sol spec/harnesses/DummyERC20B.sol spec/harnesses/DummySUSHI.sol --link MasterChefV2SimplifiedHarness:SUSHI=DummySUSHI --settings -assumeUnwindCond,-enableStorageAnalysis=true,-rule=depositThenWithdraw --verify MasterChefV2SimplifiedHarness:spec/MasterChefV2Simplified.spec --staging --msg "April 6 depositThenWithdraw on the new code"
